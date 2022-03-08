@@ -5,6 +5,18 @@ class MockView {
   goTo() {}
 }
 
+class MockAPILoginSuccesss {
+  login(username, password) {
+    this.username = username;
+    this.password = password;
+    return Promise.resolve();
+  }
+  expectToHaveBeenCalledWith(username, password) {
+    expect(username).toEqual(this.username);
+    expect(password).toEqual(this.password);
+  }
+}
+
 describe("Login Presenter", () => {
   let p = new Presenter(new MockView());
 
@@ -13,16 +25,16 @@ describe("Login Presenter", () => {
     p.username = "username";
     p.password = "password";
     p.login();
-    expect(p.API.login).toHaveBeenCalledWith("username", "password");
+    p.API.expectToHaveBeenCalledWith("username", "password");
   });
   it("should redirect to home page after login success", async () => {
     givenLoginSuccess();
     await p.login();
     expectToRedirectToHomePage(p.view);
   });
-  function givenLoginSuccess(res) {
+  function givenLoginSuccess() {
+    p.API = new MockAPILoginSuccesss();
     vi.spyOn(p.view, "goTo");
-    vi.spyOn(p.API, "login").mockResolvedValue(res);
   }
   function expectToRedirectToHomePage(view) {
     expect(view.goTo).toHaveBeenCalledWith({ name: "home" });
