@@ -20,28 +20,11 @@ describe("Login Presenter", () => {
     await p.login();
     expectToRedirectToHomePage(p.view);
   });
-  it("should store token in local storage after login success", async () => {
-    givenLoginSuccess("ok");
-    await p.login();
-    expect(localStorage.getItem("token")).toEqual("ok");
-  });
-  it("should show error after login failed", async () => {
-    givenLoginFailedWithError("Error: Request failed with status code 401");
-    await p.login();
-    expectPopupShownWithError("Error: Request failed with status code 401");
-  });
   function givenLoginSuccess(res) {
     vi.spyOn(p.view, "goTo");
     vi.spyOn(p.API, "login").mockResolvedValue(res);
   }
-  function givenLoginFailedWithError(err) {
-    vi.spyOn(p, "showError").mockImplementation();
-    vi.spyOn(p.API, "login").mockRejectedValue(err);
-  }
   function expectToRedirectToHomePage(view) {
     expect(view.goTo).toHaveBeenCalledWith({ name: "home" });
-  }
-  function expectPopupShownWithError(error) {
-    expect(p.showError).toHaveBeenCalledWith(error);
   }
 });
